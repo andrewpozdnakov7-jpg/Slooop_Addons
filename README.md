@@ -7,7 +7,9 @@ The repository currently defines two independent catalogs:
 - `wallpapers.json` for optional background images;
 - `fonts.json` for optional fonts (the catalog is reserved for future use).
 
-The catalogs are empty until the first reviewed add-on is added. Users may also select their own local wallpaper without downloading anything from this repository.
+The wallpaper catalog currently contains nine optional backgrounds. Users may also select their own local wallpaper without downloading anything from this repository.
+
+The initial wallpaper set was created with generative tools for the Slooop project and is dedicated to the public domain under CC0 1.0. Published PNG files are re-encoded to remove embedded generation prompts, timestamps and local metadata. Small WebP previews are downloaded while browsing the catalog; the full PNG is downloaded only after confirmation.
 
 Catalog URL:
 
