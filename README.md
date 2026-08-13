@@ -2,6 +2,8 @@
 
 Optional freely licensed resources for Slooop. Add-ons are downloaded only after an explicit user action and are not bundled with the application.
 
+This repository is limited to passive resource files. It is not an extension store and does not host executable code, forum modules or application updates.
+
 The repository currently defines two independent catalogs:
 
 - `wallpapers.json` for optional background images;
