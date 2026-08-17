@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+	<uses-permission android:name="android.permission.INTERNET" />
+
+	<permission
+		android:name="io.dashchan2.permission.BIND_GOOGLE_TRANSLATION_ADDON"
+		android:protectionLevel="signature" />
+
+	<application
+		android:allowBackup="false"
+		android:extractNativeLibs="false"
+		android:label="Slooop Google Translator"
+		android:usesCleartextTraffic="false">
+		<service
+			android:name=".GoogleTranslationService"
+			android:exported="true"
+			android:permission="io.dashchan2.permission.BIND_GOOGLE_TRANSLATION_ADDON"
+			android:process=":translation">
+			<intent-filter>
+				<action android:name="io.dashchan2.addon.googletranslate.TRANSLATE" />
+			</intent-filter>
+		</service>
+	</application>
+</manifest>

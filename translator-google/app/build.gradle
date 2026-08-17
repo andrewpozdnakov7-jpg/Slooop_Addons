@@ -1,0 +1,53 @@
+plugins {
+	id 'com.android.application'
+}
+
+def supportedAbis = ['arm64-v8a', 'armeabi-v7a', 'x86']
+def addonAbi = providers.gradleProperty('addonAbi').orElse('arm64-v8a').get()
+if (!supportedAbis.contains(addonAbi)) {
+	throw new GradleException('Unsupported addonAbi: ' + addonAbi)
+}
+
+android {
+	namespace = 'io.dashchan2.addon.googletranslate'
+	compileSdk = 37
+	buildToolsVersion = '36.0.0'
+
+	defaultConfig {
+		applicationId = 'io.dashchan2.addon.googletranslate'
+		minSdk = 30
+		targetSdk = 37
+		versionCode = 1
+		versionName = '1.0.0'
+		ndk {
+			abiFilters addonAbi
+		}
+		buildConfigField 'String', 'ADDON_ABI', '"' + addonAbi + '"'
+	}
+
+	buildFeatures {
+		aidl = true
+		buildConfig = true
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled = true
+			shrinkResources = true
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+		}
+	}
+
+	packaging {
+		resources.excludes += ['/META-INF/*.version', '/META-INF/DEPENDENCIES']
+	}
+
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
+	}
+}
+
+dependencies {
+	implementation 'com.google.mlkit:translate:17.0.3'
+}
