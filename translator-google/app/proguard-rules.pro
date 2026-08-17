@@ -1,0 +1,2 @@
+-keep class io.dashchan2.addon.translation.** { *; }
+-keep class io.dashchan2.addon.googletranslate.GoogleTranslationService { *; }

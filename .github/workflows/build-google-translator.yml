@@ -1,0 +1,98 @@
+name: Build Google Translator Add-on
+
+on:
+  push:
+    branches:
+      - agent/google-translation-addon
+    paths:
+      - ".github/workflows/build-google-translator.yml"
+      - "translator-google/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: google-translator-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  universal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+          cache-dependency-path: translator-google/**/*.gradle*
+
+      - name: Install Android SDK packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          ANDROID_SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          SDKMANAGER="$ANDROID_SDK/cmdline-tools/latest/bin/sdkmanager"
+          if [ -z "$ANDROID_SDK" ] || [ ! -x "$SDKMANAGER" ]; then
+            echo "sdkmanager not found at $SDKMANAGER" >&2
+            exit 1
+          fi
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses >/dev/null
+          set -o pipefail
+          "$SDKMANAGER" "platforms;android-37.0" "build-tools;36.0.0"
+
+      - name: Build unsigned universal APK
+        working-directory: translator-google
+        run: ./gradlew :app:assembleRelease -PaddonAbi=universal --console=plain
+
+      - name: Sign and verify universal APK
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.GOOGLE_TRANSLATOR_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.GOOGLE_TRANSLATOR_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.GOOGLE_TRANSLATOR_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.GOOGLE_TRANSLATOR_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for value in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!value:-}" ]; then
+              echo "Required signing secret is missing: $value" >&2
+              exit 1
+            fi
+          done
+          mkdir -p dist .signing
+          ANDROID_SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > .signing/google-translator.p12
+          chmod 600 .signing/google-translator.p12
+          "$ANDROID_SDK/build-tools/36.0.0/zipalign" -f -p 4 \
+            translator-google/app/build/outputs/apk/release/app-release-unsigned.apk \
+            dist/Slooop-Google-Translator-universal-aligned.apk
+          "$ANDROID_SDK/build-tools/36.0.0/apksigner" sign \
+            --ks .signing/google-translator.p12 \
+            --ks-type PKCS12 \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$KEYSTORE_PASSWORD" \
+            --key-pass "pass:$KEY_PASSWORD" \
+            --out dist/Slooop-Google-Translator-universal.apk \
+            dist/Slooop-Google-Translator-universal-aligned.apk
+          rm dist/Slooop-Google-Translator-universal-aligned.apk
+          "$ANDROID_SDK/build-tools/36.0.0/apksigner" verify --verbose --print-certs \
+            dist/Slooop-Google-Translator-universal.apk
+          "$ANDROID_SDK/build-tools/36.0.0/aapt" dump badging \
+            dist/Slooop-Google-Translator-universal.apk | \
+            grep -E "^(package:|native-code:)"
+          sha256sum dist/Slooop-Google-Translator-universal.apk
+
+      - name: Upload signed universal APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: google-translator-universal-signed
+          path: dist/Slooop-Google-Translator-universal.apk
+          if-no-files-found: error
+          retention-days: 7

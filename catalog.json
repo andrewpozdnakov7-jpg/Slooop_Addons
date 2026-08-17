@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "catalogs": {
     "wallpapers": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/wallpapers.json",
-    "fonts": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts.json"
+    "fonts": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts.json",
+    "translators": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/translators.json"
   }
 }

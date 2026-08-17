@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/translators.schema.json",
+  "title": "Slooop translator add-on catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "addons"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "addons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "type", "packageName", "protocolVersion", "source", "wrapperLicense", "thirdPartyTerms", "releases"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "name": {"type": "string", "minLength": 1},
+          "type": {"const": "translation-service"},
+          "packageName": {"type": "string", "pattern": "^[a-z][a-z0-9_.]+$"},
+          "protocolVersion": {"type": "integer", "minimum": 1},
+          "source": {"type": "string", "format": "uri"},
+          "wrapperLicense": {"type": "string", "minLength": 1},
+          "thirdPartyTerms": {"type": "string", "format": "uri"},
+          "releases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["versionName", "versionCode", "minSlooopVersionCode", "assets"],
+              "properties": {
+                "versionName": {"type": "string", "minLength": 1},
+                "versionCode": {"type": "integer", "minimum": 1},
+                "minSlooopVersionCode": {"type": "integer", "minimum": 1},
+                "assets": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["arm64-v8a", "armeabi-v7a", "x86"],
+                  "properties": {
+                    "arm64-v8a": {"$ref": "#/$defs/asset"},
+                    "armeabi-v7a": {"$ref": "#/$defs/asset"},
+                    "x86": {"$ref": "#/$defs/asset"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "size", "sha256", "certificateSha256"],
+      "properties": {
+        "url": {"type": "string", "format": "uri"},
+        "size": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "certificateSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

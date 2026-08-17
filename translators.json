@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "addons": [
+    {
+      "id": "google-ml-kit",
+      "name": "Google ML Kit",
+      "type": "translation-service",
+      "packageName": "io.dashchan2.addon.googletranslate",
+      "protocolVersion": 1,
+      "source": "https://github.com/andrewpozdnakov7-jpg/Slooop_Addons/tree/main/translator-google",
+      "wrapperLicense": "MIT",
+      "thirdPartyTerms": "https://developers.google.com/ml-kit/language/translation/translation-terms",
+      "releases": []
+    }
+  ]
+}
