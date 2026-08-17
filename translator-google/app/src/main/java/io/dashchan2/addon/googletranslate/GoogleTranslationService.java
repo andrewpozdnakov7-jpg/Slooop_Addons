@@ -1,14 +1,14 @@
 package io.dashchan2.addon.googletranslate;
 
+import android.app.DownloadManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.TrafficStats;
+import android.database.Cursor;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Process;
 import android.os.RemoteException;
 import android.util.Log;
 import com.google.mlkit.common.MlKit;
@@ -45,21 +45,36 @@ public final class GoogleTranslationService extends Service {
 
 	private final Handler handler = new Handler(Looper.getMainLooper());
 	private IGoogleTranslationCallback downloadCallback;
-	private long downloadStartBytes = TrafficStats.UNSUPPORTED;
+	private long lastDownloadedBytes;
+	private long lastTotalBytes = APPROXIMATE_MODEL_SIZE;
+	private boolean downloadProgressQueryErrorLogged;
 	private final Runnable progressRunnable = new Runnable() {
 		@Override
 		public void run() {
 			if (downloadCallback == null) {
 				return;
 			}
-			long current = TrafficStats.getUidRxBytes(Process.myUid());
-			long downloaded = downloadStartBytes != TrafficStats.UNSUPPORTED &&
-					current != TrafficStats.UNSUPPORTED && current >= downloadStartBytes
-					? current - downloadStartBytes : 0L;
-			reportStatus(downloadCallback, STATE_DOWNLOADING, downloaded, APPROXIMATE_MODEL_SIZE, null);
+			DownloadProgress progress = queryModelDownloadProgress();
+			if (progress != null) {
+				lastDownloadedBytes = Math.max(lastDownloadedBytes, progress.downloadedBytes);
+				if (progress.totalBytes > 0L) {
+					lastTotalBytes = progress.totalBytes;
+				}
+			}
+			reportStatus(downloadCallback, STATE_DOWNLOADING, lastDownloadedBytes, lastTotalBytes, null);
 			handler.postDelayed(this, PROGRESS_INTERVAL_MS);
 		}
 	};
+
+	private static final class DownloadProgress {
+		public final long downloadedBytes;
+		public final long totalBytes;
+
+		private DownloadProgress(long downloadedBytes, long totalBytes) {
+			this.downloadedBytes = downloadedBytes;
+			this.totalBytes = totalBytes;
+		}
+	}
 
 	private final IGoogleTranslationService.Stub binder = new IGoogleTranslationService.Stub() {
 		@Override
@@ -170,7 +185,9 @@ public final class GoogleTranslationService extends Service {
 			IGoogleTranslationCallback callback) {
 		stopProgress();
 		downloadCallback = callback;
-		downloadStartBytes = TrafficStats.getUidRxBytes(Process.myUid());
+		lastDownloadedBytes = 0L;
+		lastTotalBytes = APPROXIMATE_MODEL_SIZE;
+		downloadProgressQueryErrorLogged = false;
 		reportStatus(callback, STATE_DOWNLOADING, 0L, APPROXIMATE_MODEL_SIZE, null);
 		handler.postDelayed(progressRunnable, PROGRESS_INTERVAL_MS);
 		Translator translator = null;
@@ -202,7 +219,46 @@ public final class GoogleTranslationService extends Service {
 	private void stopProgress() {
 		handler.removeCallbacks(progressRunnable);
 		downloadCallback = null;
-		downloadStartBytes = TrafficStats.UNSUPPORTED;
+		lastDownloadedBytes = 0L;
+		lastTotalBytes = APPROXIMATE_MODEL_SIZE;
+	}
+
+	private DownloadProgress queryModelDownloadProgress() {
+		DownloadManager downloadManager = getSystemService(DownloadManager.class);
+		if (downloadManager == null) {
+			return null;
+		}
+		DownloadManager.Query query = new DownloadManager.Query().setFilterByStatus(
+				DownloadManager.STATUS_PENDING | DownloadManager.STATUS_RUNNING |
+						DownloadManager.STATUS_PAUSED);
+		try (Cursor cursor = downloadManager.query(query)) {
+			if (cursor == null) {
+				return null;
+			}
+			int downloadedIndex = cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
+			int totalIndex = cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
+			if (downloadedIndex < 0 || totalIndex < 0) {
+				return null;
+			}
+			boolean found = false;
+			long downloadedBytes = 0L;
+			long totalBytes = 0L;
+			while (cursor.moveToNext()) {
+				found = true;
+				downloadedBytes += Math.max(0L, cursor.getLong(downloadedIndex));
+				long rowTotalBytes = cursor.getLong(totalIndex);
+				if (rowTotalBytes > 0L) {
+					totalBytes += rowTotalBytes;
+				}
+			}
+			return found ? new DownloadProgress(downloadedBytes, totalBytes) : null;
+		} catch (RuntimeException error) {
+			if (!downloadProgressQueryErrorLogged) {
+				downloadProgressQueryErrorLogged = true;
+				Log.w(TAG, "Unable to query ML Kit download progress", error);
+			}
+			return null;
+		}
 	}
 
 	private static void translateTexts(String sourceLanguage, String targetLanguage, List<String> texts,
