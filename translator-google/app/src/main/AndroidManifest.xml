@@ -14,8 +14,7 @@
 		<service
 			android:name=".GoogleTranslationService"
 			android:exported="true"
-			android:permission="io.dashchan2.permission.BIND_GOOGLE_TRANSLATION_ADDON"
-			android:process=":translation">
+			android:permission="io.dashchan2.permission.BIND_GOOGLE_TRANSLATION_ADDON">
 			<intent-filter>
 				<action android:name="io.dashchan2.addon.googletranslate.TRANSLATE" />
 			</intent-filter>
