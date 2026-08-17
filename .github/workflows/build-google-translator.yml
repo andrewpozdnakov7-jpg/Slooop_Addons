@@ -1,9 +1,13 @@
-name: Build Google Translator Add-on
+name: Verify Google Translator Add-on Source
 
 on:
   push:
     branches:
-      - agent/google-translation-addon
+      - main
+    paths:
+      - ".github/workflows/build-google-translator.yml"
+      - "translator-google/**"
+  pull_request:
     paths:
       - ".github/workflows/build-google-translator.yml"
       - "translator-google/**"
@@ -51,48 +55,28 @@ jobs:
         working-directory: translator-google
         run: ./gradlew :app:assembleRelease -PaddonAbi=universal --console=plain
 
-      - name: Sign and verify universal APK
+      # This repository intentionally has no signing key and publishes no APK
+      # artifact. Installable builds are created only by the protected
+      # release-signing workflow in Dashchan_2, which verifies the Slooop
+      # certificate before exposing an artifact or updating a Release asset.
+      - name: Verify unsigned universal APK
         shell: bash
-        env:
-          KEYSTORE_BASE64: ${{ secrets.GOOGLE_TRANSLATOR_KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.GOOGLE_TRANSLATOR_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.GOOGLE_TRANSLATOR_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.GOOGLE_TRANSLATOR_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          for value in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
-            if [ -z "${!value:-}" ]; then
-              echo "Required signing secret is missing: $value" >&2
-              exit 1
-            fi
-          done
-          mkdir -p dist .signing
           ANDROID_SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
-          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > .signing/google-translator.p12
-          chmod 600 .signing/google-translator.p12
-          "$ANDROID_SDK/build-tools/36.0.0/zipalign" -f -p 4 \
-            translator-google/app/build/outputs/apk/release/app-release-unsigned.apk \
-            dist/Slooop-Google-Translator-universal-aligned.apk
-          "$ANDROID_SDK/build-tools/36.0.0/apksigner" sign \
-            --ks .signing/google-translator.p12 \
-            --ks-type PKCS12 \
-            --ks-key-alias "$KEY_ALIAS" \
-            --ks-pass "pass:$KEYSTORE_PASSWORD" \
-            --key-pass "pass:$KEY_PASSWORD" \
-            --out dist/Slooop-Google-Translator-universal.apk \
-            dist/Slooop-Google-Translator-universal-aligned.apk
-          rm dist/Slooop-Google-Translator-universal-aligned.apk
-          "$ANDROID_SDK/build-tools/36.0.0/apksigner" verify --verbose --print-certs \
-            dist/Slooop-Google-Translator-universal.apk
+          APK="translator-google/app/build/outputs/apk/release/app-release-unsigned.apk"
+          test -f "$APK"
+          if "$ANDROID_SDK/build-tools/36.0.0/apksigner" verify "$APK" >/dev/null 2>&1; then
+            echo "Source CI unexpectedly produced a signed APK" >&2
+            exit 1
+          fi
           "$ANDROID_SDK/build-tools/36.0.0/aapt" dump badging \
-            dist/Slooop-Google-Translator-universal.apk | \
+            "$APK" | \
             grep -E "^(package:|native-code:)"
-          sha256sum dist/Slooop-Google-Translator-universal.apk
-
-      - name: Upload signed universal APK
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: google-translator-universal-signed
-          path: dist/Slooop-Google-Translator-universal.apk
-          if-no-files-found: error
-          retention-days: 7
+          sha256sum "$APK"
+          {
+            echo "### Source build verified"
+            echo
+            echo "The APK is intentionally unsigned and was not uploaded."
+            echo "Use the protected Dashchan_2 release-signing workflow for an installable add-on."
+          } >> "$GITHUB_STEP_SUMMARY"
