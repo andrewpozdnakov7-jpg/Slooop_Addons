@@ -55,6 +55,46 @@ jobs:
         working-directory: translator-google
         run: ./gradlew :app:assembleRelease -PaddonAbi=universal --console=plain
 
+      - name: Verify ML Kit registrar constructors survive R8
+        shell: bash
+        run: |
+          set -euo pipefail
+          MAPPING="translator-google/app/build/outputs/mapping/release/mapping.txt"
+          python3 - "$MAPPING" <<'PY'
+          import re
+          import sys
+
+          targets = {
+              "com.google.mlkit.common.internal.CommonComponentRegistrar",
+              "com.google.mlkit.nl.translate.NaturalLanguageTranslateRegistrar",
+          }
+          blocks = {}
+          current = None
+          with open(sys.argv[1], encoding="utf-8") as stream:
+              for line in stream:
+                  match = re.match(r"^([^ ].*?) -> .*:$", line.rstrip())
+                  if match:
+                      current = match.group(1)
+                      if current in targets:
+                          blocks[current] = []
+                      continue
+                  if current in blocks:
+                      blocks[current].append(line)
+
+          missing_classes = sorted(targets - blocks.keys())
+          missing_constructors = sorted(
+              name for name, lines in blocks.items()
+              if not any("void <init>()" in line for line in lines)
+          )
+          if missing_classes or missing_constructors:
+              raise SystemExit(
+                  "ML Kit registrar R8 verification failed: "
+                  f"missing_classes={missing_classes}, "
+                  f"missing_constructors={missing_constructors}"
+              )
+          print("Verified ML Kit registrar constructors:", ", ".join(sorted(targets)))
+          PY
+
       # This repository intentionally has no signing key and publishes no APK
       # artifact. Installable builds are created only by the protected
       # release-signing workflow in Dashchan_2, which verifies the Slooop
