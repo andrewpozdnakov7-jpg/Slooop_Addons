@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
 import android.os.RemoteException;
+import android.util.Log;
 import com.google.mlkit.common.MlKit;
 import com.google.mlkit.common.model.DownloadConditions;
 import com.google.mlkit.common.model.RemoteModelManager;
@@ -27,7 +28,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class GoogleTranslationService extends Service {
+	private static final String TAG = "SlooopGoogleTranslate";
 	private static final String CLIENT_PACKAGE = "io.dashchan2";
+	private static final String PREFERENCES_NAME = "translation_models";
+	private static final String PREFERENCE_RUSSIAN_MODEL_READY = "russian_model_ready";
 	private static final int PROTOCOL_VERSION = 1;
 	private static final int STATE_NOT_INSTALLED = 0;
 	private static final int STATE_CHECKING = 1;
@@ -71,16 +75,8 @@ public final class GoogleTranslationService extends Service {
 			if (!validate(sourceLanguage, targetLanguage, callback)) {
 				return;
 			}
-			reportStatus(callback, STATE_CHECKING, 0L, APPROXIMATE_MODEL_SIZE, null);
-			try {
-				manager().isModelDownloaded(RUSSIAN_MODEL)
-						.addOnSuccessListener(installed -> reportStatus(callback,
-								Boolean.TRUE.equals(installed) ? STATE_INSTALLED : STATE_NOT_INSTALLED,
-								0L, APPROXIMATE_MODEL_SIZE, null))
-						.addOnFailureListener(error -> reportErrorStatus(callback, error));
-			} catch (RuntimeException | LinkageError error) {
-				reportErrorStatus(callback, error);
-			}
+			reportStatus(callback, isRussianModelReady() ? STATE_INSTALLED : STATE_NOT_INSTALLED,
+					0L, APPROXIMATE_MODEL_SIZE, null);
 		}
 
 		@Override
@@ -90,7 +86,7 @@ public final class GoogleTranslationService extends Service {
 			if (!validate(sourceLanguage, targetLanguage, callback)) {
 				return;
 			}
-			handler.post(() -> startModelDownload(callback));
+			handler.post(() -> startModelDownload(sourceLanguage, targetLanguage, callback));
 		}
 
 		@Override
@@ -102,8 +98,10 @@ public final class GoogleTranslationService extends Service {
 			}
 			try {
 				manager().deleteDownloadedModel(RUSSIAN_MODEL)
-						.addOnSuccessListener(ignored -> reportStatus(callback, STATE_NOT_INSTALLED,
-								0L, APPROXIMATE_MODEL_SIZE, null))
+						.addOnSuccessListener(ignored -> {
+							setRussianModelReady(false);
+							reportStatus(callback, STATE_NOT_INSTALLED, 0L, APPROXIMATE_MODEL_SIZE, null);
+						})
 						.addOnFailureListener(error -> reportErrorStatus(callback, error));
 			} catch (RuntimeException | LinkageError error) {
 				reportErrorStatus(callback, error);
@@ -125,18 +123,10 @@ public final class GoogleTranslationService extends Service {
 				}
 				safeTexts.add(text);
 			}
-			try {
-				manager().isModelDownloaded(RUSSIAN_MODEL)
-						.addOnSuccessListener(installed -> {
-							if (Boolean.TRUE.equals(installed)) {
-								translateTexts(sourceLanguage, targetLanguage, safeTexts, callback);
-							} else {
-								reportError(callback, "Google language package is not installed");
-							}
-						})
-						.addOnFailureListener(error -> reportError(callback, message(error)));
-			} catch (RuntimeException | LinkageError error) {
-				reportError(callback, message(error));
+			if (isRussianModelReady()) {
+				translateTexts(sourceLanguage, targetLanguage, safeTexts, callback);
+			} else {
+				reportError(callback, "Google language package is not installed");
 			}
 		}
 	};
@@ -176,24 +166,34 @@ public final class GoogleTranslationService extends Service {
 		return supported;
 	}
 
-	private void startModelDownload(IGoogleTranslationCallback callback) {
+	private void startModelDownload(String sourceLanguage, String targetLanguage,
+			IGoogleTranslationCallback callback) {
 		stopProgress();
 		downloadCallback = callback;
 		downloadStartBytes = TrafficStats.getUidRxBytes(Process.myUid());
 		reportStatus(callback, STATE_DOWNLOADING, 0L, APPROXIMATE_MODEL_SIZE, null);
 		handler.postDelayed(progressRunnable, PROGRESS_INTERVAL_MS);
+		Translator translator = null;
 		try {
-			manager().download(RUSSIAN_MODEL, new DownloadConditions.Builder().build())
+			translator = createTranslator(sourceLanguage, targetLanguage);
+			Translator downloadTranslator = translator;
+			downloadTranslator.downloadModelIfNeeded(new DownloadConditions.Builder().build())
 					.addOnSuccessListener(ignored -> {
+						downloadTranslator.close();
 						stopProgress();
+						setRussianModelReady(true);
 						reportStatus(callback, STATE_INSTALLED, APPROXIMATE_MODEL_SIZE,
 								APPROXIMATE_MODEL_SIZE, null);
 					})
 					.addOnFailureListener(error -> {
+						downloadTranslator.close();
 						stopProgress();
 						reportErrorStatus(callback, error);
 					});
 		} catch (RuntimeException | LinkageError error) {
+			if (translator != null) {
+				translator.close();
+			}
 			stopProgress();
 			reportErrorStatus(callback, error);
 		}
@@ -209,14 +209,9 @@ public final class GoogleTranslationService extends Service {
 			IGoogleTranslationCallback callback) {
 		Translator translator;
 		try {
-			translator = Translation.getClient(new TranslatorOptions.Builder()
-					.setSourceLanguage("en".equals(sourceLanguage)
-							? TranslateLanguage.ENGLISH : TranslateLanguage.RUSSIAN)
-					.setTargetLanguage("en".equals(targetLanguage)
-							? TranslateLanguage.ENGLISH : TranslateLanguage.RUSSIAN)
-					.build());
+			translator = createTranslator(sourceLanguage, targetLanguage);
 		} catch (RuntimeException | LinkageError error) {
-			reportError(callback, message(error));
+			reportTranslationError(callback, error);
 			return;
 		}
 		if (texts.isEmpty()) {
@@ -238,10 +233,29 @@ public final class GoogleTranslationService extends Service {
 			}).addOnFailureListener(error -> {
 				if (completed.compareAndSet(false, true)) {
 					translator.close();
-					reportError(callback, message(error));
+					reportTranslationError(callback, error);
 				}
 			});
 		}
+	}
+
+	private static Translator createTranslator(String sourceLanguage, String targetLanguage) {
+		return Translation.getClient(new TranslatorOptions.Builder()
+				.setSourceLanguage("en".equals(sourceLanguage)
+						? TranslateLanguage.ENGLISH : TranslateLanguage.RUSSIAN)
+				.setTargetLanguage("en".equals(targetLanguage)
+						? TranslateLanguage.ENGLISH : TranslateLanguage.RUSSIAN)
+				.build());
+	}
+
+	private boolean isRussianModelReady() {
+		return getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE)
+				.getBoolean(PREFERENCE_RUSSIAN_MODEL_READY, false);
+	}
+
+	private void setRussianModelReady(boolean ready) {
+		getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE).edit()
+				.putBoolean(PREFERENCE_RUSSIAN_MODEL_READY, ready).apply();
 	}
 
 	private RemoteModelManager manager() {
@@ -254,7 +268,13 @@ public final class GoogleTranslationService extends Service {
 	}
 
 	private static void reportErrorStatus(IGoogleTranslationCallback callback, Throwable error) {
+		Log.e(TAG, "ML Kit model operation failed", error);
 		reportStatus(callback, STATE_ERROR, 0L, APPROXIMATE_MODEL_SIZE, message(error));
+	}
+
+	private static void reportTranslationError(IGoogleTranslationCallback callback, Throwable error) {
+		Log.e(TAG, "ML Kit translation failed", error);
+		reportError(callback, message(error));
 	}
 
 	private static void reportStatus(IGoogleTranslationCallback callback, int state, long downloadedBytes,
