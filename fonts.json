@@ -101,6 +101,116 @@
       "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/open_dyslexic.otf",
       "sha256": "215f0b29780dbafa8c02f2f22118fb9e2ab6b27b6686e3f13c8754041a035f64",
       "fileSizeBytes": 175808
+    },
+    {
+      "id": "lato",
+      "title": "Lato",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/lato",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/lato-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/lato.ttf",
+      "sha256": "d636e4683231f931eda222d588e944d082bfd3bdba02f928bee461c0f185b251",
+      "fileSizeBytes": 656568
+    },
+    {
+      "id": "source_sans_3",
+      "title": "Source Sans 3",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/sourcesans3",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/source-sans-3-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/source_sans_3.ttf",
+      "sha256": "042fe2cc0b933e328410d7acbd0aa6a1873dca5aef81875f4bc214b08825c7b9",
+      "fileSizeBytes": 646340
+    },
+    {
+      "id": "source_serif_4",
+      "title": "Source Serif 4",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/sourceserif4",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/source-serif-4-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/source_serif_4.ttf",
+      "sha256": "97b2d4da6e3cb494b5a1e66ae176914d852ccabef49e0c02c0df25f3e39aca0b",
+      "fileSizeBytes": 1209508
+    },
+    {
+      "id": "fira_sans",
+      "title": "Fira Sans",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/firasans",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/fira-sans-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/fira_sans.ttf",
+      "sha256": "c29556a2719bf613ef3d5e070e40d903a8965d9c081beca1375dc1e6e0f93c23",
+      "fileSizeBytes": 456996
+    },
+    {
+      "id": "ibm_plex_sans",
+      "title": "IBM Plex Sans",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/ibmplexsans",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/ibm-plex-sans-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/ibm_plex_sans.ttf",
+      "sha256": "3b031aa4216174205bd8471f88a49b91f093169e9e87bd5262242bc5967fe2e3",
+      "fileSizeBytes": 537244
+    },
+    {
+      "id": "manrope",
+      "title": "Manrope",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/manrope",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/manrope-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/manrope.ttf",
+      "sha256": "d0639be45d0af36e798172419d7bd173c4bd4f29e2b76cbb69db1d11bf8b0a40",
+      "fileSizeBytes": 165420
+    },
+    {
+      "id": "rubik",
+      "title": "Rubik",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/rubik",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/rubik-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/rubik.ttf",
+      "sha256": "1b3a7437ba2af80e465e773ed60c5036d1ba6ace492d89046dbcf18fb31e4e88",
+      "fileSizeBytes": 359804
+    },
+    {
+      "id": "nunito_sans",
+      "title": "Nunito Sans",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/nunitosans",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/nunito-sans-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/nunito_sans.ttf",
+      "sha256": "f934d7142fb4784bf828da485b7dcbd90c0c80d514e9d49a5da0ed3a1ae2491d",
+      "fileSizeBytes": 571240
+    },
+    {
+      "id": "merriweather",
+      "title": "Merriweather",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/merriweather",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/merriweather-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/merriweather.ttf",
+      "sha256": "d0ed0e359e396af7ad05e73dffd11a3a4c326ea0d0283c56bd9361cb2cc86a96",
+      "fileSizeBytes": 4628080
+    },
+    {
+      "id": "jetbrains_mono",
+      "title": "JetBrains Mono",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/e1118da94a8cb00cf6d06cdac9ef13eb1e5c6ab7/ofl/jetbrainsmono",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/jetbrains-mono-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/jetbrains_mono.ttf",
+      "sha256": "48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda",
+      "fileSizeBytes": 187208
+    },
+    {
+      "id": "tinos",
+      "title": "Tinos (Times New Roman alternative)",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/googlefonts/tinos/tree/3b4482a99b80ea5fc75f187b1be3120a3f5905b3",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/tinos-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/tinos.ttf",
+      "sha256": "60a0e8ef0c04dd5dd69ffe91025fa2ae5836cbd35600a82ba031977557e2cb61",
+      "fileSizeBytes": 521588
     }
   ]
 }

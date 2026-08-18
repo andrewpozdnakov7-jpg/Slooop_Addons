@@ -10,7 +10,7 @@ The repository currently defines three independent catalogs:
 - `fonts.json` for optional application fonts;
 - `translators.json` for separately installed translation services.
 
-The wallpaper catalog currently contains nine optional backgrounds. The font catalog contains ten freely redistributable fonts that were previously bundled with Slooop. Users may also select their own local wallpaper or font without downloading anything from this repository.
+The wallpaper catalog currently contains nine optional backgrounds. The font catalog contains twenty-one freely redistributable fonts: ten families that were previously bundled with Slooop, ten additional open families with Cyrillic coverage, and Tinos as an open Times New Roman-compatible alternative. Users may also select their own local wallpaper or font without downloading anything from this repository.
 
 The initial wallpaper set was created with generative tools for the Slooop project and is dedicated to the public domain under CC0 1.0. Published PNG files are re-encoded to remove embedded generation prompts, timestamps and local metadata. Small WebP previews are downloaded while browsing the catalog; the full PNG is downloaded only after confirmation.
 
