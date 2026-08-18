@@ -4,13 +4,13 @@ Optional resources and separately installed components for Slooop. Add-ons are o
 
 Wallpapers and fonts remain passive resource catalogs. Optional executable components are isolated in their own source directories, catalogs and releases. They are never application updates or forum modules, and Slooop must verify their package name, ABI, SHA-256 and signing certificate before use.
 
-The repository currently defines two independent catalogs:
+The repository currently defines three independent catalogs:
 
 - `wallpapers.json` for optional background images;
-- `fonts.json` for optional fonts (the catalog is reserved for future use);
+- `fonts.json` for optional application fonts;
 - `translators.json` for separately installed translation services.
 
-The wallpaper catalog currently contains nine optional backgrounds. Users may also select their own local wallpaper without downloading anything from this repository.
+The wallpaper catalog currently contains nine optional backgrounds. The font catalog contains ten freely redistributable fonts that were previously bundled with Slooop. Users may also select their own local wallpaper or font without downloading anything from this repository.
 
 The initial wallpaper set was created with generative tools for the Slooop project and is dedicated to the public domain under CC0 1.0. Published PNG files are re-encoded to remove embedded generation prompts, timestamps and local metadata. Small WebP previews are downloaded while browsing the catalog; the full PNG is downloaded only after confirmation.
 
@@ -22,11 +22,11 @@ https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/wallpa
 
 ## Adding an add-on
 
-Every entry must provide its author, license, dimensions, file size and SHA-256 hash. Only images that can be redistributed under the declared license may be added. Do not commit source prompts, personal metadata or unreviewed third-party images.
+Wallpaper entries must provide their author, license, dimensions, file size and SHA-256 hash. Font entries must provide their title, upstream source, license, file size and SHA-256 hash. Only resources that can be redistributed under the declared license may be added. Do not commit source prompts, personal metadata or unreviewed third-party files.
 
-Store wallpaper previews in `wallpapers/previews/`, wallpaper files in `wallpapers/images/`, and future fonts in `fonts/files/`. Use stable lowercase identifiers and keep existing files immutable after publication; replace an asset with a new identifier instead.
+Store wallpaper previews in `wallpapers/previews/`, wallpaper files in `wallpapers/images/`, font files in `fonts/files/`, and font license texts in `fonts/licenses/`. Use stable lowercase identifiers and keep existing files immutable after publication; replace an asset with a new identifier instead.
 
-The wallpaper catalog format is documented and validated by `wallpapers.schema.json`.
+The wallpaper and font catalog formats are documented and validated by `wallpapers.schema.json` and `fonts.schema.json`. Font entries must retain their upstream license and source link. Slooop verifies the declared size, SHA-256 hash and font container before storing a downloaded font in its private data directory.
 
 ## Google translation add-on
 

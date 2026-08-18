@@ -1,4 +1,106 @@
 {
+  "$schema": "./fonts.schema.json",
   "schemaVersion": 1,
-  "fonts": []
+  "fonts": [
+    {
+      "id": "roboto",
+      "title": "Roboto",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/roboto",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/roboto-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/roboto.ttf",
+      "sha256": "d7598e12c5dbef095ff8272cfc55da0250bd07fbdecbac8a530b9b277872a134",
+      "fileSizeBytes": 488584
+    },
+    {
+      "id": "inter",
+      "title": "Inter",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/inter",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/inter-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/inter.ttf",
+      "sha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+      "fileSizeBytes": 876576
+    },
+    {
+      "id": "noto_sans",
+      "title": "Noto Sans",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/notosans",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/noto-sans-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/noto_sans.ttf",
+      "sha256": "bfb7bb691513f12e734dc346c03a03f784912432d7e3fa8e56efcf906fe86b3d",
+      "fileSizeBytes": 2049096
+    },
+    {
+      "id": "noto_serif",
+      "title": "Noto Serif",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/notoserif",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/noto-serif-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/noto_serif.ttf",
+      "sha256": "4d8e6761424656867019081a1a01336f3cb086982682698714054fc33f782713",
+      "fileSizeBytes": 1887192
+    },
+    {
+      "id": "open_sans",
+      "title": "Open Sans",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/opensans",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/open-sans-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/open_sans.ttf",
+      "sha256": "36643644f318a812aab2d2ed3bb98f8cf0872527f835fe9398d95fe6b9adb878",
+      "fileSizeBytes": 532636
+    },
+    {
+      "id": "pt_sans",
+      "title": "PT Sans",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/ptsans",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/pt-sans-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/pt_sans.ttf",
+      "sha256": "9cc831490532009bae2b3ce0d39c62adfc889060beb421593bfd9d2396d0f10a",
+      "fileSizeBytes": 442960
+    },
+    {
+      "id": "pt_serif",
+      "title": "PT Serif",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/ptserif",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/pt-serif-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/pt_serif.ttf",
+      "sha256": "a4951fade06ff8f09b7673aa81ffb65a8cd409e24d3289a6dc670bc4dda2557a",
+      "fileSizeBytes": 359048
+    },
+    {
+      "id": "ubuntu",
+      "title": "Ubuntu",
+      "license": "Ubuntu Font Licence 1.0",
+      "sourceUrl": "https://github.com/google/fonts/tree/main/ufl/ubuntu",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/ubuntu-LICENCE.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/ubuntu.ttf",
+      "sha256": "3128df86a31805618436d0ae5651ba4285d0c9de0a39057d025f64ee33bceb64",
+      "fileSizeBytes": 351884
+    },
+    {
+      "id": "montserrat",
+      "title": "Montserrat",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/montserrat",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/montserrat-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/montserrat.ttf",
+      "sha256": "0f7b311b2f3279e4eef9b2f968bcdbab6e28f4daeb1f049f4f278a902bcd82f7",
+      "fileSizeBytes": 744936
+    },
+    {
+      "id": "open_dyslexic",
+      "title": "OpenDyslexic",
+      "license": "OFL-1.1",
+      "sourceUrl": "https://forge.hackers.town/antijingoist/opendyslexic",
+      "licenseUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/open-dyslexic-OFL.txt",
+      "fileUrl": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/open_dyslexic.otf",
+      "sha256": "215f0b29780dbafa8c02f2f22118fb9e2ab6b27b6686e3f13c8754041a035f64",
+      "fileSizeBytes": 175808
+    }
+  ]
 }

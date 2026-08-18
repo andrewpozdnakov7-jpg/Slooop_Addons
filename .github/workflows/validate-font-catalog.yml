@@ -1,0 +1,97 @@
+name: Validate Font Catalog
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/validate-font-catalog.yml"
+      - "fonts.json"
+      - "fonts.schema.json"
+      - "fonts/**"
+  pull_request:
+    paths:
+      - ".github/workflows/validate-font-catalog.yml"
+      - "fonts.json"
+      - "fonts.schema.json"
+      - "fonts/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: font-catalog-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Validate catalog, licenses, hashes, sizes and containers
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          jq --exit-status '(.schemaVersion == 1)
+            and (.fonts | type == "array" and length > 0 and length <= 100)
+            and (all(.fonts[];
+              (.id | test("^[a-z0-9][a-z0-9_]{0,63}$"))
+              and (.title | type == "string" and length > 0 and length <= 80)
+              and (.license | type == "string" and length > 0 and length <= 80)
+              and (.sourceUrl | test("^https://"))
+              and (.licenseUrl | test("^https://"))
+              and (.fileUrl | test("^https://"))
+              and (.sha256 | test("^[a-f0-9]{64}$"))
+              and (.fileSizeBytes | type == "number" and . > 0 and . <= 20971520)))' fonts.json >/dev/null
+          jq empty fonts.schema.json
+
+          entry_count="$(jq '.fonts | length' fonts.json)"
+          unique_ids="$(jq '[.fonts[].id] | unique | length' fonts.json)"
+          unique_files="$(jq '[.fonts[].fileUrl] | unique | length' fonts.json)"
+          test "$entry_count" -eq "$unique_ids"
+          test "$entry_count" -eq "$unique_files"
+
+          while IFS=$'\t' read -r id file_url license_url expected_sha expected_size; do
+            case "$file_url" in
+              https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/files/*) ;;
+              *) echo "Unexpected font URL for $id: $file_url" >&2; exit 1 ;;
+            esac
+            case "$license_url" in
+              https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts/licenses/*) ;;
+              *) echo "Unexpected license URL for $id: $license_url" >&2; exit 1 ;;
+            esac
+
+            file="fonts/files/${file_url##*/}"
+            license_file="fonts/licenses/${license_url##*/}"
+            test -f "$file"
+            test -s "$license_file"
+            test "$(stat --format=%s "$file")" -eq "$expected_size"
+            echo "$expected_sha  $file" | sha256sum --check --status
+
+            magic="$(od --address-radix=n --format=x1 --read-bytes=4 "$file" | tr -d ' \n')"
+            case "$file" in
+              *.ttf) test "$magic" = "00010000" ;;
+              *.otf) test "$magic" = "4f54544f" ;;
+              *) echo "Unsupported font container: $file" >&2; exit 1 ;;
+            esac
+          done < <(jq --raw-output '.fonts[] |
+            [.id, .fileUrl, .licenseUrl, .sha256, (.fileSizeBytes | tostring)] | @tsv' fonts.json)
+
+          file_count="$(find fonts/files -maxdepth 1 -type f \( -name '*.ttf' -o -name '*.otf' \) | wc -l)"
+          test "$entry_count" -eq "$file_count"
+
+      - name: Reject local paths and private keys
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep --recursive --binary-files=without-match --line-number --extended-regexp \
+            '(C:\\Users\\|/home/[^/]+/|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY)' \
+            fonts.json fonts.schema.json fonts/licenses; then
+            echo "Local path or private key marker found in font catalog files" >&2
+            exit 1
+          fi
