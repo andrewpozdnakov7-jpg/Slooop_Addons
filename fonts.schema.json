@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/andrewpozdnakov7-jpg/Slooop_Addons/main/fonts.schema.json",
+  "title": "Slooop font catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "fonts"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "fonts": {
+      "type": "array",
+      "maxItems": 100,
+      "items": { "$ref": "#/$defs/font" }
+    }
+  },
+  "$defs": {
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "title", "license", "sourceUrl", "licenseUrl", "fileUrl", "sha256", "fileSizeBytes"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_]{0,63}$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "license": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "sourceUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "licenseUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "fileUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "fileSizeBytes": { "type": "integer", "minimum": 1, "maximum": 20971520 }
+      }
+    }
+  }
+}
